@@ -49,7 +49,7 @@ class lessc(object):
         splitter = '\\' if osName == 'nt' else '/'
         if css is None:
             raise(AttributeError(
-                'cssify() requires less file link'))
+                'lessc.cssify() requires less file link'))
         elif path.isfile(path.abspath(css)):
             if self.hash == self.getHash(path.abspath(css)):
                 return self.returnLink()
@@ -69,6 +69,8 @@ class lessc(object):
                         tabs=self.tabs
                     ))
                 return self.returnLink()
+        else:
+            raise(FileNotFoundError('lessc.cssify(css=) cannot find the css file'))
 
 
     def getHash(self, file):
