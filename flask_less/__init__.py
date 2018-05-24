@@ -86,7 +86,7 @@ class lessc(object):
         """ to return html ready link if needed """
         if self.inTag:
             return Markup(
-                '<link rel="stylesheet" href="%s"></link>' % self.path
+                '<link rel="stylesheet" href="/%s"></link>' % self.path
             )
         else:
-            return self.path
+            return '/' + self.path
