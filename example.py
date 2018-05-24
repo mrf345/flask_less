@@ -22,7 +22,7 @@ def root():
     if not path.isdir('static'):
         mkdir('static')
     with open('static/main.less', 'w+') as file:
-        file.write("body { color: red; background-color: darken(red, 30%) }")
+        file.write("h1 { color: white; } body { color: red; background-color: darken(red, 30%) }")
     with open('index.html', 'w+') as file:
         file.write("<html><head>{{cssify('static/main.less')}}")
         file.write("</head><body><h1>Flask-Less Example !</body></html>")

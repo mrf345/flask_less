@@ -64,7 +64,7 @@ class lessc(object):
                 with open(self.path, 'w+') as file:
                     file.write(C(
                         path.abspath(css),
-                        minify=self.minify,
+                        xminify=self.minify,
                         spaces=self.spaces,
                         tabs=self.tabs
                     ))
@@ -83,6 +83,7 @@ class lessc(object):
 
 
     def returnLink(self):
+        """ to return html ready link if needed """
         if self.inTag:
             return Markup(
                 '<link rel="stylesheet" href="%s"></link>' % self.path
