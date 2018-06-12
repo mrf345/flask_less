@@ -78,7 +78,7 @@ class lessc(object):
         hashing = md5()
         with open(file, 'r') as rFile:
             por = rFile.read()
-            hashing.update(por)
+            hashing.update(por.encode('utf8'))
         return hashing.hexdigest()
 
 
