@@ -9,7 +9,10 @@ if version_info.major == 2:
 
 
 class lessc(object):
-    def __init__(self, app=None, minify=True, spaces=True, tabs=False, inTag=True):
+    def __init__(
+        self, app=None, minify=True,
+        spaces=True, tabs=False, inTag=True
+    ):
         """
         A Flask extension to add lesscpy support to the template, and
         recompile less file if changed.
@@ -25,18 +28,18 @@ class lessc(object):
         self.spaces = spaces
         self.tabs = tabs
         self.inTag = inTag
-        self.hash = None
-        self.path = None
+        self.STORAGE = {}  # where compiled less files stored
         if self.app is None:
             raise(AttributeError("lessc(app=) requires Flask app instance"))
         for arg in [
             ['minify', minify],
             ['spaces', spaces],
-            ['tabs', tabs]]:
+            ['tabs', tabs]
+        ]:
             if not isinstance(arg[1], bool):
-                raise(TypeError("lessc(" + arg[0] + "=) requires True or False"))
+                raise(TypeError("lessc(" + arg[0] + "=) requires"
+                " True or False"))
         self.injectThem()
-
 
     def injectThem(self):
         """ injecting cssify into the template as cssify """
@@ -44,49 +47,36 @@ class lessc(object):
         def inject_vars():
             return dict(cssify=self.cssify)
 
-
     def cssify(self, css=None):
         splitter = '\\' if osName == 'nt' else '/'
         if css is None:
             raise(AttributeError(
                 'lessc.cssify() requires less file link'))
         elif path.isfile(path.abspath(css)):
-            if self.hash == self.getHash(path.abspath(css)):
-                return self.returnLink()
+            if css in self.STORAGE.keys():
+                return self.returnLink(self.STORAGE[css])
             else:
                 splittedPath = css.split(splitter)
                 cssName = splittedPath[len(splittedPath) - 1].split('.')[0]
                 splittedPath[len(splittedPath) - 1] = cssName + '.css'
-                self.path = splitter.join(splittedPath)
-                self.hash = self.getHash(path.abspath(css))
-                if path.isfile(self.path):
-                    remove(self.path)
-                with open(self.path, 'w+') as file:
+                cssPath = splitter.join(splittedPath)
+                with open(cssPath, 'w+') as file:
                     file.write(C(
                         path.abspath(css),
                         xminify=self.minify,
                         spaces=self.spaces,
-                        tabs=self.tabs
-                    ))
-                return self.returnLink()
+                        tabs=self.tabs))
+                self.STORAGE[css] = cssPath
+                return self.returnLink(cssPath)
         else:
-            raise(FileNotFoundError('lessc.cssify(css=) cannot find the css file'))
+            raise(FileNotFoundError(
+                'lessc.cssify(css=) cannot find the css file'))
 
-
-    def getHash(self, file):
-        """ to get md5 hash of css file to make sure not changed """
-        hashing = md5()
-        with open(file, 'r') as rFile:
-            por = rFile.read()
-            hashing.update(por.encode('utf8'))
-        return hashing.hexdigest()
-
-
-    def returnLink(self):
+    def returnLink(self, css_path):
         """ to return html ready link if needed """
         if self.inTag:
             return Markup(
-                '<link rel="stylesheet" href="/%s"></link>' % self.path
+                '<link rel="stylesheet" href="/%s"></link>' % css_path
             )
         else:
-            return '/' + self.path
+            return '/' + css_path
