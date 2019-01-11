@@ -47,27 +47,30 @@ class lessc(object):
         def inject_vars():
             return dict(cssify=self.cssify)
 
-    def cssify(self, css=None):
+    def cssify(self, less=None):
         splitter = '\\' if osName == 'nt' else '/'
-        if css is None:
+        if less is None:
             raise(AttributeError(
                 'lessc.cssify() requires less file link'))
-        elif path.isfile(path.abspath(css)):
-            if css in self.STORAGE.keys():
-                return self.returnLink(self.STORAGE[css])
+
+        lessPath = splitter.join([self.app.static_folder, less])
+        if path.isfile(path.abspath(lessPath)):
+            if less in self.STORAGE.keys():
+                return self.returnLink(self.STORAGE[less])
             else:
-                splittedPath = css.split(splitter)
-                cssName = splittedPath[len(splittedPath) - 1].split('.')[0]
-                splittedPath[len(splittedPath) - 1] = cssName + '.css'
-                cssPath = splitter.join(splittedPath)
+                splittedPath = less.split(splitter)
+                cssName = splittedPath[-1].split('.')[0] + '.css'
+                splittedPath[-1] = cssName
+                cssRelPath = splitter.join(splittedPath)
+                cssPath = splitter.join([self.app.static_folder, cssRelPath])
                 with open(cssPath, 'w+') as file:
                     file.write(C(
-                        path.abspath(css),
+                        path.abspath(lessPath),
                         xminify=self.minify,
                         spaces=self.spaces,
                         tabs=self.tabs))
-                self.STORAGE[css] = cssPath
-                return self.returnLink(cssPath)
+                self.STORAGE[less] = cssRelPath
+                return self.returnLink(cssRelPath)
         else:
             raise(FileNotFoundError(
                 'lessc.cssify(css=) cannot find the css file'))
@@ -80,3 +83,4 @@ class lessc(object):
             )
         else:
             return '/' + css_path
+
