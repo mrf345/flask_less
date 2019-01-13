@@ -10,7 +10,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Less',
-    version='0.5',
+    version='0.6',
     url='https://github.com/mrf345/flask_less/',
     download_url='https://github.com/mrf345/flask_less/archive/0.5.tar.gz',
     license='MIT',
